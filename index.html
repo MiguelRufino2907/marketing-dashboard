@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdsHQ — Dashboard de Campanhas</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --meta:#1877F2;--google:#4285F4;--tiktok:#FF0050;
+  --bg:#0A0B0F;--card:#111318;--card2:#181B22;--card3:#1e2229;
+  --border:rgba(255,255,255,0.07);--text:#E8E8EA;--muted:#7A7D8A;
+  --green:#22C55E;--red:#EF4444;--amber:#F59E0B;--purple:#818CF8;
+  --cyan:#06B6D4;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:13px;min-height:100vh}
+.nav{display:flex;align-items:center;background:var(--card);border-bottom:1px solid var(--border);padding:0 16px;position:sticky;top:0;z-index:100;overflow-x:auto;gap:0}
+.nav::-webkit-scrollbar{height:0}
+.logo{font-size:14px;font-weight:700;color:#fff;padding:13px 16px 13px 0;border-right:1px solid var(--border);margin-right:8px;white-space:nowrap;letter-spacing:-.5px}
+.logo span{color:var(--meta)}
+.nav-tab{padding:13px 12px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;font-size:11px;font-weight:600;white-space:nowrap;transition:color .2s;letter-spacing:.3px}
+.nav-tab:hover{color:var(--text)}
+.nav-tab.active{color:var(--text);border-bottom-color:#6366F1}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:6px;padding-left:12px}
+.page{display:none;padding:18px}
+.page.active{display:block}
+.filters{display:flex;align-items:center;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.fl{color:var(--muted);font-size:10px;margin-right:2px;text-transform:uppercase;letter-spacing:.5px}
+.chip{padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:var(--card2);color:var(--muted);font-size:11px;cursor:pointer;transition:all .15s;font-weight:500}
+.chip:hover,.chip.active{background:#232630;color:var(--text);border-color:rgba(255,255,255,.18)}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.csm{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.kl{font-size:10px;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.6px}
+.kv{font-size:22px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;line-height:1}
+.kd{font-size:10px;margin-top:4px}
+.up{color:var(--green)}.dn{color:var(--red)}.nt{color:var(--muted)}
+.kico{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;margin-bottom:8px}
+.sec{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;color:var(--muted);text-align:left;padding:7px 10px;border-bottom:1px solid var(--border);font-weight:700;text-transform:uppercase;letter-spacing:.4px;cursor:pointer;white-space:nowrap}
+th:hover{color:var(--text)}
+td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.03);font-size:12px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.tw{overflow-x:auto}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700}
+.bg{background:rgba(34,197,94,.14);color:var(--green)}
+.br{background:rgba(239,68,68,.14);color:var(--red)}
+.ba{background:rgba(245,158,11,.14);color:var(--amber)}
+.bb{background:rgba(24,119,242,.14);color:var(--meta)}
+.bp{background:rgba(129,140,248,.14);color:var(--purple)}
+.bc{background:rgba(6,182,212,.14);color:var(--cyan)}
+.btt{background:rgba(255,0,80,.12);color:var(--tiktok)}
+.plat{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600}
+.pd{width:6px;height:6px;border-radius:50%}
+.pb{height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;margin-top:3px}
+.pf{height:100%;border-radius:2px;transition:width .5s}
+.fi{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:12px;outline:none;transition:border-color .2s}
+.fi:focus{border-color:rgba(99,102,241,.5)}
+.fsl{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:12px;outline:none}
+.fta{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:12px;outline:none;resize:vertical;min-height:60px}
+.flab{font-size:10px;color:var(--muted);margin-bottom:4px;display:block;text-transform:uppercase;letter-spacing:.4px}
+.fg{margin-bottom:12px}
+.btn{padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:11px;cursor:pointer;transition:all .15s;font-weight:600}
+.btn:hover{background:#232630}
+.btnp{background:#6366F1;border-color:#6366F1;color:#fff}
+.btnp:hover{background:#5457e0}
+.btnd{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:var(--red)}
+.stat{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.stat:last-child{border-bottom:none}
+.acc{display:flex;align-items:center;gap:10px;padding:10px;background:var(--card2);border-radius:8px;border:1px solid var(--border)}
+.aico{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.alert-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;border-left:3px solid transparent;background:var(--card2);margin-bottom:8px}
+.alert-card.alr{border-left-color:var(--red)}
+.alert-card.ala{border-left-color:var(--amber)}
+.alert-card.alg{border-left-color:var(--green)}
+.sparkbar{display:inline-flex;align-items:flex-end;gap:2px;height:24px}
+.sparkbar span{width:4px;border-radius:1px;background:rgba(255,255,255,.15)}
+.sparkbar span.hi{background:#6366F1}
+.tab2{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px}
+.tab2-item{padding:8px 14px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;font-size:11px;font-weight:600;margin-bottom:-1px;transition:color .2s}
+.tab2-item:hover{color:var(--text)}
+.tab2-item.active{color:var(--text);border-bottom-color:#6366F1}
+.tog{position:relative;width:32px;height:18px;background:rgba(255,255,255,.12);border-radius:9px;transition:background .2s;display:inline-block;cursor:pointer;flex-shrink:0}
+.tog.on{background:#6366F1}
+.tog-knob{position:absolute;top:2px;left:2px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .2s}
+.tog.on .tog-knob{transform:translateX(14px)}
+.score-ring{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0}
+.toast{position:fixed;bottom:20px;right:20px;background:#1a1d24;border:1px solid var(--green);border-radius:8px;padding:10px 16px;color:var(--green);font-size:12px;z-index:9999;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;font-weight:600}
+.toast.show{opacity:1;transform:translateY(0)}
+.funnel-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.funnel-track{flex:1;height:20px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
+.funnel-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px}
+.funnel-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.9)}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="nav">
+  <div class="logo">Ads<span>HQ</span></div>
+  <div class="nav-tab active" onclick="P('dash',this)">Dashboard</div>
+  <div class="nav-tab" onclick="P('meta',this)">Meta Ads</div>
+  <div class="nav-tab" onclick="P('google',this)">Google Ads</div>
+  <div class="nav-tab" onclick="P('tiktok',this)">TikTok Ads</div>
+  <div class="nav-tab" onclick="P('comparativo',this)">Comparativo</div>
+  <div class="nav-tab" onclick="P('funil',this)">Funil</div>
+  <div class="nav-tab" onclick="P('alertas',this)">Alertas</div>
+  <div class="nav-tab" onclick="P('relatorios',this)">Relatórios</div>
+  <div class="nav-tab" onclick="P('config',this)">Config.</div>
+  <div class="nav-right">
+    <select class="fsl" style="width:120px;padding:5px 8px;font-size:10px" onchange="showT('Filtrando: '+this.value)">
+      <option>Todos Clientes</option><option>Loja Bella</option><option>Clínica Viva</option><option>TechPrime</option>
+    </select>
+    <button class="btn btnp" onclick="showT('Exportando PDF...')">↓ Exportar</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div><div class="page active" id="page-dash">
+  <div class="filters">
+    <span class="fl">Período:</span>
+    <div class="chip active" onclick="F(this)">7 dias</div>
+    <div class="chip" onclick="F(this)">14 dias</div>
+    <div class="chip" onclick="F(this)">30 dias</div>
+    <div class="chip" onclick="F(this)">90 dias</div>
+    <div style="margin-left:auto;display:flex;gap:6px">
+      <input type="date" class="fi" value="2026-03-01" style="width:130px;padding:4px 8px">
+      <input type="date" class="fi" value="2026-03-27" style="width:130px;padding:4px 8px">
+    </div>
+  </div>
+  <div class="g4">
+    <div class="csm"><div class="kico" style="background:rgba(99,102,241,.15)">💰</div><div class="kl">Invest. Total</div><div class="kv">R$ 47.320</div><div class="kd up">▲ 12,4% vs anterior</div></div>
+    <div class="csm"><div class="kico" style="background:rgba(34,197,94,.15)">📈</div><div class="kl">Receita Atribuída</div><div class="kv">R$ 198.744</div><div class="kd up">▲ 8,1% vs anterior</div></div>
+    <div class="csm"><div class="kico" style="background:rgba(245,158,11,.15)">⚡</div><div class="kl">ROAS Médio</div><div class="kv">4,20x</div><div class="kd dn">▼ 0,3x vs anterior</div></div>
+    <div class="csm"><div class="kico" style="background:rgba(24,119,242,.15)">🎯</div><div class="kl">Leads Gerados</div><div class="kv">1.847</div><div class="kd up">▲ 22,5% vs anterior</div></div>
+  </div>
+  <div class="g4" style="margin-top:-6px">
+    <div class="csm"><div class="kl">CPL Médio</div><div class="kv" style="font-size:18px">R$ 25,62</div><div class="kd up">▲ melhora 8%</div></div>
+    <div class="csm"><div class="kl">Alcance Total</div><div class="kv" style="font-size:18px">3,8M</div><div class="kd up">▲ 15%</div></div>
+    <div class="csm"><div class="kl">Impressões</div><div class="kv" style="font-size:18px">12,4M</div><div class="kd up">▲ 9%</div></div>
+    <div class="csm"><div class="kl">CTR Médio</div><div class="kv" style="font-size:18px">2,87%</div><div class="kd up">▲ 0,3pp</div></div>
+  </div>
+  <div class="g21">
+    <div class="card"><div class="sec">Performance 30 dias</div><div style="position:relative;height:170px"><canvas id="cLine"></canvas></div></div>
+    <div class="card"><div class="sec">Budget por plataforma</div><div style="position:relative;height:130px"><canvas id="cDonut"></canvas></div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:var(--meta)"></div><div class="pb" style="flex:1"><div class="pf" style="width:48%;background:var(--meta)"></div></div><span style="font-size:10px;color:var(--muted);min-width:52px">Meta 48%</span></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:var(--google)"></div><div class="pb" style="flex:1"><div class="pf" style="width:34%;background:var(--google)"></div></div><span style="font-size:10px;color:var(--muted);min-width:52px">Google 34%</span></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:var(--tiktok)"></div><div class="pb" style="flex:1"><div class="pf" style="width:18%;background:var(--tiktok)"></div></div><span style="font-size:10px;color:var(--muted);min-width:52px">TikTok 18%</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="g3">
+    <div class="card"><div class="sec">ROAS por cliente</div><div style="position:relative;height:140px"><canvas id="cClienteRoas"></canvas></div></div>
+    <div class="card"><div class="sec">Invest. por dia da semana</div><div style="position:relative;height:140px"><canvas id="cDiaSem"></canvas></div></div>
+    <div class="card"><div class="sec">Top campanhas — ROAS</div><div id="topCamp"></div></div>
+  </div>
+  <div class="card"><div class="sec">Todas as Campanhas</div>
+    <div class="tw"><table id="tAll"><thead><tr><th onclick="ST('tAll',0)">Campanha ↕</th><th onclick="ST('tAll',1)">Plat. ↕</th><th onclick="ST('tAll',2)">Status ↕</th><th onclick="ST('tAll',3)">Cliente ↕</th><th onclick="ST('tAll',4)">Invest. ↕</th><th onclick="ST('tAll',5)">Receita ↕</th><th onclick="ST('tAll',6)">ROAS ↕</th><th onclick="ST('tAll',7)">Leads ↕</th><th onclick="ST('tAll',8)">CPL ↕</th><th>Tend.</th></tr></thead><tbody id="tbAll"></tbody></table></div>
+  </div>
+</div>
+<div class="page" id="page-meta">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+    <div style="width:26px;height:26px;border-radius:6px;background:var(--meta);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff">f</div>
+    <div style="font-size:15px;font-weight:700">Meta Ads</div>
+    <div class="filters" style="margin:0;margin-left:auto"><div class="chip active" onclick="F(this)">7d</div><div class="chip" onclick="F(this)">14d</div><div class="chip" onclick="F(this)">30d</div></div>
+  </div>
+  <div class="g4">
+    <div class="csm"><div class="kl">Alcance</div><div class="kv" style="font-size:19px">284.512</div><div class="kd up">▲ 18%</div></div>
+    <div class="csm"><div class="kl">Impressões</div><div class="kv" style="font-size:19px">1,2M</div><div class="kd up">▲ 9%</div></div>
+    <div class="csm"><div class="kl">CPM</div><div class="kv" style="font-size:19px">R$ 18,40</div><div class="kd dn">▼ 3%</div></div>
+    <div class="csm"><div class="kl">CTR</div><div class="kv" style="font-size:19px">2,84%</div><div class="kd up">▲ 0,4pp</div></div>
+  </div>
+  <div class="g4" style="margin-top:-6px">
+    <div class="csm"><div class="kl">CPC</div><div class="kv" style="font-size:19px">R$ 0,65</div><div class="kd dn">▼ R$0,08</div></div>
+    <div class="csm"><div class="kl">CPA</div><div class="kv" style="font-size:19px">R$ 34,20</div><div class="kd up">▲ melhora 5%</div></div>
+    <div class="csm"><div class="kl">ROAS</div><div class="kv" style="font-size:19px">4,8x</div><div class="kd up">▲ 0,6x</div></div>
+    <div class="csm"><div class="kl">Invest. Meta</div><div class="kv" style="font-size:19px">R$ 22.714</div><div class="kd up">▲ 11%</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="sec">Alcance vs Cliques</div><div style="position:relative;height:150px"><canvas id="cMetaArea"></canvas></div></div>
+    <div class="card"><div class="sec">Performance por objetivo</div><div style="position:relative;height:150px"><canvas id="cMetaObj"></canvas></div></div>
+  </div>
+  <div class="card" style="margin-bottom:10px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="sec" style="margin:0">Campanhas Meta</div>
+      <div style="display:flex;gap:5px"><div class="chip active" onclick="setNivel(this,'campanha')">Campanha</div><div class="chip" onclick="setNivel(this,'conjunto')">Conjunto</div><div class="chip" onclick="setNivel(this,'anuncio')">Anúncio</div></div>
+    </div>
+    <div class="tw"><table><thead><tr><th>Nome</th><th>Status</th><th>Objetivo</th><th>Público</th><th>Invest.</th><th>Alcance</th><th>CTR</th><th>ROAS</th><th>Leads</th></tr></thead><tbody id="tbMeta"></tbody></table></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="sec">Top Criativos</div><div id="metaCreat"></div></div>
+    <div class="card"><div class="sec">Segmentação por Idade e Gênero</div><div style="position:relative;height:160px"><canvas id="cMetaAge"></canvas></div></div>
+  </div>
+</div>
+<div class="page" id="page-google">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+    <div style="width:26px;height:26px;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#4285F4">G</div>
+    <div style="font-size:15px;font-weight:700">Google Ads</div>
+    <div class="filters" style="margin:0;margin-left:auto"><div class="chip active">7d</div><div class="chip" onclick="F(this)">14d</div><div class="chip" onclick="F(this)">30d</div><select class="fsl" style="width:110px;padding:4px 8px;font-size:10px;margin-left:6px"><option>Todos tipos</option><option>Search</option><option>Display</option><option>PMax</option></select></div>
+  </div>
+  <div class="g4">
+    <div class="csm"><div class="kl">Impressões</div><div class="kv" style="font-size:19px">892.340</div><div class="kd up">▲ 7%</div></div>
+    <div class="csm"><div class="kl">Cliques</div><div class="kv" style="font-size:19px">24.810</div><div class="kd up">▲ 14%</div></div>
+    <div class="csm"><div class="kl">CTR</div><div class="kv" style="font-size:19px">2,78%</div><div class="kd up">▲ 0,2pp</div></div>
+    <div class="csm"><div class="kl">CPC Médio</div><div class="kv" style="font-size:19px">R$ 0,64</div><div class="kd dn">▼ R$0,04</div></div>
+  </div>
+  <div class="g4" style="margin-top:-6px">
+    <div class="csm"><div class="kl">Conversões</div><div class="kv" style="font-size:19px">487</div><div class="kd up">▲ 18%</div></div>
+    <div class="csm"><div class="kl">CPA</div><div class="kv" style="font-size:19px">R$ 32,76</div><div class="kd up">▲ melhora</div></div>
+    <div class="csm"><div class="kl">ROAS</div><div class="kv" style="font-size:19px">3,9x</div><div class="kd up">▲ 0,4x</div></div>
+    <div class="csm"><div class="kl">Invest. Google</div><div class="kv" style="font-size:19px">R$ 16.090</div><div class="kd up">▲ 6%</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="sec">Impressões vs Conversões</div><div style="position:relative;height:150px"><canvas id="cGoogLine"></canvas></div></div>
+    <div class="card"><div class="sec">Performance por Dispositivo</div><div style="position:relative;height:150px"><canvas id="cGoogDev"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="sec">Campanhas Google</div>
+      <div class="tw"><table><thead><tr><th>Campanha</th><th>Tipo</th><th>Status</th><th>Q.Score</th><th>Invest.</th><th>Conv.</th><th>ROAS</th></tr></thead><tbody id="tbGoog"></tbody></table></div>
+    </div>
+    <div class="card"><div class="sec">Top Keywords</div>
+      <div class="tw"><table><thead><tr><th>Keyword</th><th>Match</th><th>Cliques</th><th>CPC</th><th>Conv.</th></tr></thead><tbody id="tbKw"></tbody></table></div>
+    </div>
+  </div>
+</div>
+<div class="page" id="page-tiktok">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+    <div style="width:26px;height:26px;border-radius:6px;background:#000;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--tiktok)">TT</div>
+    <div style="font-size:15px;font-weight:700">TikTok Ads</div>
+    <div class="filters" style="margin:0;margin-left:auto"><div class="chip active">7d</div><div class="chip" onclick="F(this)">14d</div><div class="chip" onclick="F(this)">30d</div></div>
+  </div>
+  <div class="g4">
+    <div class="csm"><div class="kl">Reproduções</div><div class="kv" style="font-size:19px">2,4M</div><div class="kd up">▲ 32%</div></div>
+    <div class="csm"><div class="kl">CPV</div><div class="kv" style="font-size:19px">R$ 0,03</div><div class="kd dn">▼ R$0,01</div></div>
+    <div class="csm"><div class="kl">Taxa Conclusão</div><div class="kv" style="font-size:19px">38,4%</div><div class="kd up">▲ 4,2pp</div></div>
+    <div class="csm"><div class="kl">Engajamento</div><div class="kv" style="font-size:19px">142.800</div><div class="kd up">▲ 28%</div></div>
+  </div>
+  <div class="g4" style="margin-top:-6px">
+    <div class="csm"><div class="kl">CPC</div><div class="kv" style="font-size:19px">R$ 0,82</div><div class="kd nt">estável</div></div>
+    <div class="csm"><div class="kl">CPA</div><div class="kv" style="font-size:19px">R$ 41,60</div><div class="kd dn">▼ subiu 5%</div></div>
+    <div class="csm"><div class="kl">ROAS</div><div class="kv" style="font-size:19px">3,2x</div><div class="kd up">▲ 0,3x</div></div>
+    <div class="csm"><div class="kl">Invest. TikTok</div><div class="kv" style="font-size:19px">R$ 8.516</div><div class="kd up">▲ 15%</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="sec">Views vs Engajamentos</div><div style="position:relative;height:150px"><canvas id="cTTArea"></canvas></div></div>
+    <div class="card"><div class="sec">Retenção de Vídeo</div><div style="position:relative;height:150px"><canvas id="cTTRet"></canvas></div></div>
+  </div>
+  <div class="card"><div class="sec">Top Criativos TikTok</div><div id="ttCreat"></div></div>
+</div>
+<div class="page" id="page-comparativo">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div style="font-size:15px;font-weight:700">Comparativo de Plataformas</div>
+    <div class="filters" style="margin:0"><div class="chip active" onclick="F(this)">7d</div><div class="chip" onclick="F(this)">14d</div><div class="chip" onclick="F(this)">30d</div></div>
+  </div>
+  <div class="g3">
+    <div class="card" style="text-align:center">
+      <div style="font-size:11px;font-weight:700;color:var(--meta);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Meta Ads</div>
+      <div class="score-ring" style="border:3px solid var(--meta);color:var(--meta);margin:0 auto 10px">4,8</div>
+      <div style="font-size:10px;color:var(--muted)">ROAS</div>
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px" id="compMeta"></div>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:11px;font-weight:700;color:var(--google);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Google Ads</div>
+      <div class="score-ring" style="border:3px solid var(--google);color:var(--google);margin:0 auto 10px">3,9</div>
+      <div style="font-size:10px;color:var(--muted)">ROAS</div>
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px" id="compGoogle"></div>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:11px;font-weight:700;color:var(--tiktok);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">TikTok Ads</div>
+      <div class="score-ring" style="border:3px solid var(--tiktok);color:var(--tiktok);margin:0 auto 10px">3,2</div>
+      <div style="font-size:10px;color:var(--muted)">ROAS</div>
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px" id="compTikTok"></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="sec">ROAS comparativo</div><div style="position:relative;height:180px"><canvas id="cCompRoas"></canvas></div></div>
+    <div class="card"><div class="sec">CPA comparativo</div><div style="position:relative;height:180px"><canvas id="cCompCpa"></canvas></div></div>
+  </div>
+  <div class="card"><div class="sec">Tabela Comparativa</div>
+    <div class="tw"><table><thead><tr><th>Métrica</th><th style="color:var(--meta)">Meta</th><th style="color:var(--google)">Google</th><th style="color:var(--tiktok)">TikTok</th><th>Melhor</th></tr></thead>
+    <tbody>
+      <tr><td style="color:var(--muted)">ROAS</td><td style="color:var(--green);font-weight:700">4,8x</td><td>3,9x</td><td>3,2x</td><td><span class="badge bg">Meta</span></td></tr>
+      <tr><td style="color:var(--muted)">CPA</td><td>R$ 34,20</td><td style="color:var(--green);font-weight:700">R$ 32,76</td><td>R$ 41,60</td><td><span class="badge bg">Google</span></td></tr>
+      <tr><td style="color:var(--muted)">CTR</td><td>2,84%</td><td>2,78%</td><td style="color:var(--green);font-weight:700">3,20%</td><td><span class="badge btt">TikTok</span></td></tr>
+      <tr><td style="color:var(--muted)">CPM</td><td>R$ 18,40</td><td>R$ 11,20</td><td style="color:var(--green);font-weight:700">R$ 9,80</td><td><span class="badge btt">TikTok</span></td></tr>
+      <tr><td style="color:var(--muted)">Leads</td><td style="color:var(--green);font-weight:700">642</td><td>487</td><td>98</td><td><span class="badge bg">Meta</span></td></tr>
+    </tbody></table></div>
+  </div>
+</div>
+<div class="page" id="page-funil">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div style="font-size:15px;font-weight:700">Funil de Conversão</div>
+    <div class="filters" style="margin:0">
+      <select class="fsl" style="width:130px;padding:5px 8px;font-size:11px"><option>Todas Plataformas</option><option>Meta Ads</option><option>Google Ads</option><option>TikTok Ads</option></select>
+      <select class="fsl" style="width:120px;padding:5px 8px;font-size:11px;margin-left:6px"><option>Todos Clientes</option><option>Loja Bella</option><option>Clínica Viva</option><option>TechPrime</option></select>
+    </div>
+  </div>
+  <div class="g21">
+    <div class="card">
+      <div class="sec">Funil Geral — 30 dias</div>
+      <div id="funnelViz" style="padding:8px 0"></div>
+      <div style="margin-top:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        <div style="text-align:center;padding:10px;background:var(--card2);border-radius:7px"><div style="font-size:10px;color:var(--muted)">Alcance→Clique</div><div style="font-size:13px;font-weight:700;color:var(--cyan)">3,86%</div></div>
+        <div style="text-align:center;padding:10px;background:var(--card2);border-radius:7px"><div style="font-size:10px;color:var(--muted)">Clique→Lead</div><div style="font-size:13px;font-weight:700;color:var(--cyan)">3,86%</div></div>
+        <div style="text-align:center;padding:10px;background:var(--card2);border-radius:7px"><div style="font-size:10px;color:var(--muted)">Lead→Venda</div><div style="font-size:13px;font-weight:700;color:var(--green)">26,4%</div></div>
+        <div style="text-align:center;padding:10px;background:var(--card2);border-radius:7px"><div style="font-size:10px;color:var(--muted)">Conv. Geral</div><div style="font-size:13px;font-weight:700;color:var(--green)">0,039%</div></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="card"><div class="sec">Funil por Plataforma</div><div style="position:relative;height:160px"><canvas id="cFunilPlat"></canvas></div></div>
+      <div class="card"><div class="sec">Drop-offs</div>
+        <div class="stat"><span style="font-size:11px">Impressão→Alcance</span><span style="font-size:11px;font-weight:700;color:var(--muted)">-67,7%</span></div>
+        <div class="stat"><span style="font-size:11px">Alcance→Clique</span><span style="font-size:11px;font-weight:700;color:var(--amber)">-96,1%</span></div>
+        <div class="stat"><span style="font-size:11px">Clique→Lead</span><span style="font-size:11px;font-weight:700;color:var(--amber)">-96,1%</span></div>
+        <div class="stat"><span style="font-size:11px">Lead→Venda</span><span style="font-size:11px;font-weight:700;color:var(--green)">-73,6%</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card"><div class="sec">Funil por Cliente</div>
+    <div class="tw"><table><thead><tr><th>Cliente</th><th>Invest.</th><th>Alcance</th><th>Cliques</th><th>Leads</th><th>Vendas</th><th>ROAS</th><th>CPL</th><th>Conv.%</th></tr></thead>
+    <tbody>
+      <tr><td style="font-weight:600">Loja Bella</td><td>R$ 22.000</td><td>184.000</td><td>5.240</td><td>610</td><td>218</td><td style="color:var(--green);font-weight:700">4,7x</td><td>R$ 36,07</td><td><span class="badge bg">35,7%</span></td></tr>
+      <tr><td style="font-weight:600">Clínica Viva</td><td>R$ 15.000</td><td>121.000</td><td>3.180</td><td>820</td><td>164</td><td style="color:var(--green);font-weight:700">4,2x</td><td>R$ 18,29</td><td><span class="badge bg">20,0%</span></td></tr>
+      <tr><td style="font-weight:600">TechPrime</td><td>R$ 10.320</td><td>—</td><td>2.390</td><td>417</td><td>105</td><td style="color:var(--amber);font-weight:700">3,4x</td><td>R$ 24,75</td><td><span class="badge ba">25,2%</span></td></tr>
+    </tbody></table></div>
+  </div>
+</div><div class="page" id="page-alertas">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div style="font-size:15px;font-weight:700">Central de Alertas</div>
+    <div style="display:flex;gap:6px">
+      <button class="btn" onclick="showT('Todos marcados como lidos')">Marcar todos lidos</button>
+      <button class="btn btnp" onclick="showT('Abrindo editor...')">+ Novo Alerta</button>
+    </div>
+  </div>
+  <div class="g3">
+    <div class="csm" style="border-left:3px solid var(--red)"><div class="kl">Alertas Críticos</div><div class="kv" style="font-size:26px;color:var(--red)">3</div><div class="kd dn">▲ 2 novos hoje</div></div>
+    <div class="csm" style="border-left:3px solid var(--amber)"><div class="kl">Avisos</div><div class="kv" style="font-size:26px;color:var(--amber)">5</div><div class="kd nt">1 novo hoje</div></div>
+    <div class="csm" style="border-left:3px solid var(--green)"><div class="kl">Oportunidades</div><div class="kv" style="font-size:26px;color:var(--green)">4</div><div class="kd up">2 novas hoje</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="sec">Alertas Ativos</div><div id="alertasList"></div></div>
+    <div class="card">
+      <div class="sec">Histórico — 7 dias</div>
+      <div style="position:relative;height:160px"><canvas id="cAlertas"></canvas></div>
+      <div style="margin-top:16px"><div class="sec">Regras Configuradas</div><div id="regrasList"></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec">Nova Regra de Alerta</div>
+    <div class="g3" style="margin:0">
+      <div class="fg"><label class="flab">Métrica</label><select class="fsl"><option>ROAS</option><option>CPA</option><option>CTR</option><option>CPM</option><option>Investimento diário</option></select></div>
+      <div class="fg"><label class="flab">Condição</label><select class="fsl"><option>Menor que</option><option>Maior que</option><option>Variação de %</option></select></div>
+      <div class="fg"><label class="flab">Valor</label><input class="fi" type="number" value="2.5"></div>
+    </div>
+    <div class="g3" style="margin:0">
+      <div class="fg"><label class="flab">Plataforma</label><select class="fsl"><option>Todas</option><option>Meta Ads</option><option>Google Ads</option><option>TikTok Ads</option></select></div>
+      <div class="fg"><label class="flab">Canal</label><select class="fsl"><option>E-mail</option><option>WhatsApp</option><option>Ambos</option></select></div>
+      <div class="fg"><label class="flab">Frequência</label><select class="fsl"><option>Imediato</option><option>Resumo diário</option><option>Semanal</option></select></div>
+    </div>
+    <button class="btn btnp" style="padding:8px 20px" onclick="showT('Regra salva!')">Salvar Regra</button>
+  </div>
+</div>
+<div class="page" id="page-relatorios">
+  <div class="tab2">
+    <div class="tab2-item active" onclick="T2(this,'relForm')">Novo Relatório</div>
+    <div class="tab2-item" onclick="T2(this,'relHist')">Histórico</div>
+    <div class="tab2-item" onclick="T2(this,'relAgend')">Agendamentos</div>
+    <div class="tab2-item" onclick="T2(this,'relModelos')">Modelos</div>
+  </div>
+  <div id="relForm">
+    <div class="g2">
+      <div class="card">
+        <div class="sec">Configurar Relatório</div>
+        <div class="fg"><label class="flab">Nome</label><input class="fi" placeholder="Ex: Relatório Março 2026 — Loja Bella"></div>
+        <div class="fg"><label class="flab">Cliente</label><select class="fsl"><option>Loja Bella</option><option>Clínica Viva</option><option>TechPrime</option></select></div>
+        <div class="fg"><label class="flab">Plataformas</label>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:#6366F1"> Meta Ads</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" checked style="accent-color:#6366F1"> Google Ads</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" style="accent-color:#6366F1"> TikTok Ads</label>
+          </div>
+        </div>
+        <div class="fg"><label class="flab">Período</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <input class="fi" type="date" value="2026-03-01"><input class="fi" type="date" value="2026-03-27">
+          </div>
+        </div>
+        <div class="fg"><label class="flab">Formato</label><select class="fsl"><option>📄 PDF</option><option>📧 E-mail HTML</option><option>💬 WhatsApp</option><option>🔗 Link compartilhável</option></select></div>
+        <div class="fg"><label class="flab">Destinatários</label><input class="fi" placeholder="email@cliente.com"></div>
+        <div class="fg"><label class="flab">Mensagem</label><textarea class="fta">Olá! Confira o desempenho das campanhas do período. 🚀</textarea></div>
+        <div class="fg"><label class="flab">Agendamento</label>
+          <select class="fsl" onchange="document.getElementById('agEx').style.display=this.value=='r'?'grid':'none'">
+            <option value="i">Envio imediato</option><option value="r">Recorrente</option>
+          </select>
+        </div>
+        <div id="agEx" style="display:none;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;margin-top:8px">
+          <select class="fsl"><option>Semanal</option><option>Quinzenal</option><option>Mensal</option></select>
+          <select class="fsl"><option>Segunda-feira</option><option>Sexta-feira</option><option>Dia 1 do mês</option></select>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" style="flex:1" onclick="showT('Rascunho salvo!')">Salvar Rascunho</button>
+          <button class="btn btnp" style="flex:2;padding:10px" id="btnEnviar" onclick="enviar()">Gerar e Enviar →</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="card">
+          <div class="sec">Preview</div>
+          <div style="background:var(--card2);border-radius:8px;padding:14px;border:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:10px">
+              <div style="width:28px;height:28px;border-radius:6px;background:#6366F1;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">AQ</div>
+              <div><div style="font-size:12px;font-weight:700">Relatório de Campanhas</div><div style="font-size:10px;color:var(--muted)">Mar 2026 · Loja Bella</div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div style="background:rgba(99,102,241,.1);border-radius:6px;padding:8px"><div style="font-size:10px;color:var(--muted)">Investimento</div><div style="font-size:16px;font-weight:700">R$ 22.000</div></div>
+              <div style="background:rgba(34,197,94,.1);border-radius:6px;padding:8px"><div style="font-size:10px;color:var(--muted)">Receita</div><div style="font-size:16px;font-weight:700;color:var(--green)">R$ 103.400</div></div>
+              <div style="background:rgba(245,158,11,.1);border-radius:6px;padding:8px"><div style="font-size:10px;color:var(--muted)">ROAS</div><div style="font-size:16px;font-weight:700;color:var(--amber)">4,7x</div></div>
+              <div style="background:rgba(24,119,242,.1);border-radius:6px;padding:8px"><div style="font-size:10px;color:var(--muted)">Leads</div><div style="font-size:16px;font-weight:700;color:var(--meta)">610</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="sec">Estatísticas</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="text-align:center;padding:12px;background:var(--card2);border-radius:7px"><div style="font-size:20px;font-weight:700;color:var(--green)">24</div><div style="font-size:10px;color:var(--muted);margin-top:2px">Enviados este mês</div></div>
+            <div style="text-align:center;padding:12px;background:var(--card2);border-radius:7px"><div style="font-size:20px;font-weight:700;color:var(--amber)">3</div><div style="font-size:10px;color:var(--muted);margin-top:2px">Agendados</div></div>
+            <div style="text-align:center;padding:12px;background:var(--card2);border-radius:7px"><div style="font-size:20px;font-weight:700;color:var(--purple)">98%</div><div style="font-size:10px;color:var(--muted);margin-top:2px">Taxa de entrega</div></div>
+            <div style="text-align:center;padding:12px;background:var(--card2);border-radius:7px"><div style="font-size:20px;font-weight:700;color:var(--cyan)">4,8★</div><div style="font-size:10px;color:var(--muted);margin-top:2px">Avaliação média</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="relHist" style="display:none"><div class="card"><div class="sec">Histórico de Relatórios</div><div id="relHistList"></div></div></div>
+  <div id="relAgend" style="display:none"><div class="card"><div class="sec">Relatórios Agendados</div><div id="relAgendList"></div></div></div>
+  <div id="relModelos" style="display:none">
+    <div class="g3">
+      <div class="card" style="cursor:pointer" onclick="showT('Modelo Executivo aplicado!')"><div style="font-size:13px;font-weight:700;margin-bottom:6px">Modelo Executivo</div><div style="font-size:11px;color:var(--muted);line-height:1.6">KPIs principais e resumo. Ideal para diretores.</div><div style="margin-top:10px;display:flex;gap:4px"><span class="badge bb">Meta</span><span class="badge bb">Google</span><span class="badge btt">TikTok</span></div></div>
+      <div class="card" style="cursor:pointer" onclick="showT('Modelo Operacional aplicado!')"><div style="font-size:13px;font-weight:700;margin-bottom:6px">Modelo Operacional</div><div style="font-size:11px;color:var(--muted);line-height:1.6">Tabelas detalhadas por campanha e keywords.</div><div style="margin-top:10px;display:flex;gap:4px"><span class="badge bg">Detalhado</span><span class="badge bp">Criativos</span></div></div>
+      <div class="card" style="cursor:pointer" onclick="showT('Modelo Cliente aplicado!')"><div style="font-size:13px;font-weight:700;margin-bottom:6px">Modelo Cliente</div><div style="font-size:11px;color:var(--muted);line-height:1.6">Visual simplificado para envio direto ao cliente.</div><div style="margin-top:10px;display:flex;gap:4px"><span class="badge bc">Visual</span><span class="badge ba">Simplificado</span></div></div>
+    </div>
+  </div>
+</div>
+<div class="page" id="page-config">
+  <div class="tab2">
+    <div class="tab2-item active" onclick="T2(this,'cfgContas')">Contas</div>
+    <div class="tab2-item" onclick="T2(this,'cfgClientes')">Clientes</div>
+    <div class="tab2-item" onclick="T2(this,'cfgAlertas')">Alertas</div>
+    <div class="tab2-item" onclick="T2(this,'cfgVisual')">Visual</div>
+    <div class="tab2-item" onclick="T2(this,'cfgInteg')">Integrações</div>
+  </div>
+  <div id="cfgContas">
+    <div class="g2">
+      <div class="card"><div class="sec">Contas Conectadas</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="acc"><div class="aico" style="background:var(--meta);color:#fff">f</div><div style="flex:1"><div style="font-weight:600;font-size:12px">Meta Business Suite</div><div style="font-size:10px;color:var(--muted)">3 contas · Última sync: há 2 min</div></div><span class="badge bg">● Ativo</span></div>
+          <div class="acc"><div class="aico" style="background:#fff;color:#4285F4">G</div><div style="flex:1"><div style="font-weight:600;font-size:12px">Google Ads</div><div style="font-size:10px;color:var(--muted)">2 contas · Última sync: há 5 min</div></div><span class="badge bg">● Ativo</span></div>
+          <div class="acc"><div class="aico" style="background:#000;color:var(--tiktok);font-size:10px">TT</div><div style="flex:1"><div style="font-weight:600;font-size:12px">TikTok for Business</div><div style="font-size:10px;color:var(--muted)">Token expirado</div></div><span class="badge ba">⚠ Expirado</span></div>
+        </div>
+        <button class="btn" style="margin-top:12px;width:100%" onclick="showT('Abrindo OAuth...')">+ Adicionar conta</button>
+      </div>
+      <div class="card"><div class="sec">Sincronização</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="stat"><span style="font-size:12px">Frequência</span><select class="fsl" style="width:130px;padding:4px 8px;font-size:11px"><option>A cada 15 min</option><option>A cada hora</option><option>Manual</option></select></div>
+          <div class="stat"><span style="font-size:12px">Fuso horário</span><select class="fsl" style="width:130px;padding:4px 8px;font-size:11px"><option>América/São_Paulo</option><option>UTC</option></select></div>
+          <div class="stat"><span style="font-size:12px">Última sync</span><span style="font-size:11px;color:var(--green)">27/03/2026 14:32</span></div>
+        </div>
+        <button class="btn btnp" style="margin-top:12px;width:100%;padding:8px" onclick="showT('Sync iniciada...')">▶ Sincronizar Agora</button>
+      </div>
+    </div>
+  </div>
+  <div id="cfgClientes" style="display:none"><div class="card"><div class="sec">Clientes</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="acc"><div class="aico" style="background:rgba(99,102,241,.2);color:var(--purple);font-size:12px;font-weight:700">LB</div><div style="flex:1"><div style="font-weight:600;font-size:12px">Loja Bella</div><div style="font-size:10px;color:var(--muted)">Meta + Google · R$ 22.000/mês</div></div><button class="btn" onclick="showT('Editando...')">Editar</button></div>
+      <div class="acc"><div class="aico" style="background:rgba(34,197,94,.15);color:var(--green);font-size:12px;font-weight:700">CV</div><div style="flex:1"><div style="font-weight:600;font-size:12px">Clínica Viva</div><div style="font-size:10px;color:var(--muted)">Meta + TikTok · R$ 15.000/mês</div></div><button class="btn" onclick="showT('Editando...')">Editar</button></div>
+      <div class="acc"><div class="aico" style="background:rgba(245,158,11,.15);color:var(--amber);font-size:12px;font-weight:700">TP</div><div style="flex:1"><div style="font-weight:600;font-size:12px">TechPrime</div><div style="font-size:10px;color:var(--muted)">Google + TikTok · R$ 10.320/mês</div></div><button class="btn" onclick="showT('Editando...')">Editar</button></div>
+    </div>
+    <button class="btn btnp" style="margin-top:12px;width:100%;padding:8px" onclick="showT('Novo cliente...')">+ Novo Cliente</button>
+  </div></div>
+  <div id="cfgAlertas" style="display:none"><div class="card"><div class="sec">Regras de Alerta</div><div id="cfgRegrasList"></div><button class="btn btnp" style="margin-top:12px;padding:8px 20px" onclick="showT('Nova regra...')">+ Nova Regra</button></div></div>
+  <div id="cfgVisual" style="display:none"><div class="g2">
+    <div class="card"><div class="sec">Marca e Visual</div>
+      <div class="fg"><label class="flab">Nome da Agência</label><input class="fi" value="Agência Quantum"></div>
+      <div class="fg"><label class="flab">Cor Principal</label><div style="display:flex;gap:8px"><input type="color" value="#6366F1" style="width:38px;height:32px;border:none;background:none;cursor:pointer"><input class="fi" value="#6366F1" style="flex:1"></div></div>
+      <button class="btn btnp" style="width:100%;padding:8px;margin-top:4px" onclick="showT('Visual salvo!')">Salvar</button>
+    </div>
+    <div class="card"><div class="sec">Mensagens Padrão</div>
+      <div class="fg"><label class="flab">Abertura</label><textarea class="fta">Olá! Confira o desempenho das suas campanhas. 🚀</textarea></div>
+      <div class="fg"><label class="flab">Assinatura</label><input class="fi" value="Equipe Agência Quantum · (41) 9 9999-0000"></div>
+      <button class="btn btnp" style="width:100%;padding:8px;margin-top:4px" onclick="showT('Salvo!')">Salvar</button>
+    </div>
+  </div></div>
+  <div id="cfgInteg" style="display:none"><div class="g2">
+    <div class="card"><div class="sec">Integrações</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="acc"><div class="aico" style="background:rgba(37,211,102,.15);color:#25D366;font-size:11px;font-weight:700">WA</div><div style="flex:1"><div style="font-weight:600;font-size:12px">WhatsApp Business API</div><div style="font-size:10px;color:var(--muted)">Uazapi · Instância ativa</div></div><span class="badge bg">● Ativo</span></div>
+        <div class="acc"><div class="aico" style="background:rgba(99,102,241,.15);color:var(--purple);font-size:11px;font-weight:700">N8</div><div style="flex:1"><div style="font-weight:600;font-size:12px">N8N Webhooks</div><div style="font-size:10px;color:var(--muted)">3 webhooks configurados</div></div><span class="badge bg">● Ativo</span></div>
+        <div class="acc"><div class="aico" style="background:rgba(245,158,11,.15);color:var(--amber);font-size:11px;font-weight:700">RD</div><div style="flex:1"><div style="font-weight:600;font-size:12px">RD Station CRM</div><div style="font-size:10px;color:var(--muted)">Não configurado</div></div><span class="badge ba">⚠ Inativo</span></div>
+      </div>
+    </div>
+    <div class="card"><div class="sec">Webhook N8N</div>
+      <div class="fg"><label class="flab">URL</label><input class="fi" value="https://n8n.agencia.com/webhook/ads-report"></div>
+      <div class="fg"><label class="flab">Evento</label><select class="fsl"><option>Relatório enviado</option><option>Alerta disparado</option><option>Sync concluída</option></select></div>
+      <button class="btn btnp" style="width:100%;padding:8px;margin-top:4px" onclick="showT('Webhook testado! 200 OK')">Testar Webhook</button>
+    </div>
+  </div></div>
+</div><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+const cd={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#7A7D8A',font:{size:10},boxWidth:10,padding:10}}},scales:{x:{ticks:{color:'#7A7D8A',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#7A7D8A',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}};
+const lb8=['2/3','5/3','8/3','11/3','14/3','17/3','20/3','23/3'];
+const mk=(b,v,n=8)=>Array.from({length:n},()=>Math.round(b+(Math.random()-.35)*v));
+let ci={};
+function P(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');if(el)el.classList.add('active');const init={dash:initDash,meta:initMeta,google:initGoogle,tiktok:initTikTok,comparativo:initComp,funil:initFunil,alertas:initAlertas};if(init[id]&&!ci[id]){setTimeout(init[id],80);ci[id]=1;}}
+function F(el){const p=el.closest('.filters')||el.parentElement;p.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active')}
+function showT(m){const t=document.getElementById('toast');t.textContent='✓ '+m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
+function ST(tid,col){const tb=document.getElementById(tid);if(!tb)return;const tbody=tb.querySelector('tbody');const rows=Array.from(tbody.querySelectorAll('tr'));const dir=tbody.dataset.d==='a'?'d':'a';tbody.dataset.d=dir;rows.sort((a,b)=>{const at=a.cells[col].textContent.trim(),bt=b.cells[col].textContent.trim(),an=parseFloat(at.replace(/[^0-9.]/g,'')),bn=parseFloat(bt.replace(/[^0-9.]/g,''));if(!isNaN(an)&&!isNaN(bn))return dir==='a'?an-bn:bn-an;return dir==='a'?at.localeCompare(bt,'pt'):bt.localeCompare(at,'pt')});rows.forEach(r=>tbody.appendChild(r))}
+function T2(el,secId){el.closest('.tab2').querySelectorAll('.tab2-item').forEach(i=>i.classList.remove('active'));el.classList.add('active');['relForm','relHist','relAgend','relModelos','cfgContas','cfgClientes','cfgAlertas','cfgVisual','cfgInteg'].forEach(s=>{const e=document.getElementById(s);if(e)e.style.display='none'});const t=document.getElementById(secId);if(t)t.style.display='block';if(secId==='relHist')renderRelHist();if(secId==='relAgend')renderRelAgend();if(secId==='cfgAlertas')renderCfgRegras();}
+function setNivel(el,n){el.closest('.card').querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');showT('Nível: '+n)}
+const camps=[
+  {n:'Remarketing Verão',p:'Meta',s:'Ativo',c:'Loja Bella',inv:8400,rec:41200,roas:4.9,leads:312,cpl:26.92},
+  {n:'Conversão Produtos',p:'Meta',s:'Ativo',c:'Loja Bella',inv:6200,rec:28400,roas:4.6,leads:198,cpl:31.31},
+  {n:'Search Brand',p:'Google',s:'Ativo',c:'TechPrime',inv:4800,rec:19680,roas:4.1,leads:145,cpl:33.10},
+  {n:'PMax Shopping',p:'Google',s:'Ativo',c:'Loja Bella',inv:6100,rec:22570,roas:3.7,leads:189,cpl:32.27},
+  {n:'Awareness Clínica',p:'TikTok',s:'Ativo',c:'Clínica Viva',inv:4200,rec:13440,roas:3.2,leads:98,cpl:42.86},
+  {n:'Lead Implante',p:'Meta',s:'Pausado',c:'Clínica Viva',inv:5100,rec:20910,roas:4.1,leads:142,cpl:35.91},
+  {n:'Display Awareness',p:'Google',s:'Em revisão',c:'TechPrime',inv:3200,rec:9920,roas:3.1,leads:72,cpl:44.44},
+  {n:'TikTok Produto Hero',p:'TikTok',s:'Ativo',c:'Loja Bella',inv:4316,rec:13811,roas:3.2,leads:87,cpl:49.61},
+  {n:'Conversão Consulta',p:'Meta',s:'Ativo',c:'Clínica Viva',inv:3014,rec:13563,roas:4.5,leads:206,cpl:14.63},
+  {n:'Search Non-Brand',p:'Google',s:'Pausado',c:'TechPrime',inv:1990,rec:5970,roas:3.0,leads:54,cpl:36.85},
+];
+const pC={'Meta':'#1877F2','Google':'#4285F4','TikTok':'#FF0050'};
+const sC={'Ativo':'bg','Pausado':'ba','Em revisão':'bb'};
+function pb(p){return`<span class="plat"><span class="pd" style="background:${pC[p]}"></span>${p}</span>`}
+function sb(s){return`<span class="badge ${sC[s]||'bb'}">${s==='Ativo'?'●':s==='Pausado'?'⏸':'⟳'} ${s}</span>`}
+function spk(vals){const mx=Math.max(...vals);return`<div class="sparkbar">${vals.map((v,i)=>`<span class="${i===vals.length-1?'hi':''}" style="height:${Math.round(v/mx*20)}px"></span>`).join('')}</div>`}
+function initDash(){
+  document.getElementById('tbAll').querySelector('tbody').innerHTML=camps.map(c=>`<tr><td style="font-weight:600">${c.n}</td><td>${pb(c.p)}</td><td>${sb(c.s)}</td><td style="color:var(--muted);font-size:11px">${c.c}</td><td>R$ ${c.inv.toLocaleString('pt-BR')}</td><td style="color:var(--green)">R$ ${c.rec.toLocaleString('pt-BR')}</td><td style="font-weight:700">${c.roas.toFixed(1)}x</td><td>${c.leads}</td><td style="color:var(--muted)">R$ ${c.cpl.toFixed(2)}</td><td>${spk(mk(c.roas,.5,5))}</td></tr>`).join('');
+  document.getElementById('topCamp').innerHTML=[...camps].sort((a,b)=>b.roas-a.roas).slice(0,5).map(c=>`<div class="stat"><div><div style="font-size:12px;font-weight:600">${c.n}</div><div style="font-size:10px;color:var(--muted)">${c.p} · ${c.c}</div></div><div style="text-align:right"><div style="font-weight:700;color:var(--green)">${c.roas.toFixed(1)}x</div><div style="font-size:10px;color:var(--muted)">R$ ${c.inv.toLocaleString('pt-BR')}</div></div></div>`).join('');
+  new Chart(document.getElementById('cLine'),{type:'line',data:{labels:lb8,datasets:[{label:'Meta',data:mk(12000,3000),borderColor:'#1877F2',backgroundColor:'rgba(24,119,242,.08)',tension:.4,fill:true,pointRadius:3},{label:'Google',data:mk(8000,2500),borderColor:'#4285F4',backgroundColor:'rgba(66,133,244,.06)',tension:.4,fill:true,pointRadius:3},{label:'TikTok',data:mk(4000,1800),borderColor:'#FF0050',backgroundColor:'rgba(255,0,80,.06)',tension:.4,fill:true,pointRadius:3}]},options:cd});
+  new Chart(document.getElementById('cDonut'),{type:'doughnut',data:{labels:['Meta','Google','TikTok'],datasets:[{data:[48,34,18],backgroundColor:['#1877F2','#4285F4','#FF0050'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false}}}});
+  new Chart(document.getElementById('cClienteRoas'),{type:'bar',data:{labels:['Loja Bella','Clínica Viva','TechPrime'],datasets:[{label:'Meta',data:[4.8,4.3,null],backgroundColor:'#1877F2',borderRadius:4},{label:'Google',data:[3.7,null,3.5],backgroundColor:'#4285F4',borderRadius:4},{label:'TikTok',data:[3.2,3.1,3.2],backgroundColor:'#FF0050',borderRadius:4}]},options:cd});
+  new Chart(document.getElementById('cDiaSem'),{type:'bar',data:{labels:['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],datasets:[{label:'Invest.',data:[8200,7400,9100,8600,11200,6800,5400],backgroundColor:'rgba(99,102,241,.7)',borderRadius:4}]},options:{...cd,plugins:{legend:{display:false}}}});
+}
+function initMeta(){
+  document.getElementById('tbMeta').innerHTML=[{n:'Remarketing Verão',s:'Ativo',obj:'Conversão',pub:'Remarketing 60d',inv:'R$ 8.400',alc:'124.812',ctr:'3,4%',roas:'4,9x',leads:312},{n:'Conversão Produtos',s:'Ativo',obj:'Conversão',pub:'LAL 2%',inv:'R$ 6.200',alc:'98.430',ctr:'2,9%',roas:'4,6x',leads:198},{n:'Lead Implante',s:'Pausado',obj:'Leads',pub:'Interesses Saúde',inv:'R$ 5.100',alc:'74.210',ctr:'2,1%',roas:'4,1x',leads:142},{n:'Awareness Marca',s:'Ativo',obj:'Alcance',pub:'Broad 25-45',inv:'R$ 3.014',alc:'87.060',ctr:'1,8%',roas:'—',leads:0}].map(c=>`<tr><td style="font-weight:600">${c.n}</td><td>${sb(c.s)}</td><td><span class="badge bp">${c.obj}</span></td><td style="font-size:10px;color:var(--muted)">${c.pub}</td><td>${c.inv}</td><td>${c.alc}</td><td style="font-weight:600">${c.ctr}</td><td style="font-weight:700;color:var(--green)">${c.roas}</td><td>${c.leads||'—'}</td></tr>`).join('');
+  document.getElementById('metaCreat').innerHTML=[{e:'🛍️',n:'Carrossel Produtos Verão',ctr:'4,2%',s:'Top'},{e:'📸',n:'Story Promo Flash 15s',ctr:'3,8%',s:'Ativo'},{e:'🎬',n:'Vídeo Reels 15s',ctr:'3,1%',s:'Ativo'},{e:'✨',n:'Static Sale Banner',ctr:'2,7%',s:'Teste'}].map(c=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)"><div style="width:38px;height:38px;border-radius:6px;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px">${c.e}</div><div style="flex:1"><div style="font-size:12px;font-weight:600">${c.n}</div><div style="font-size:10px;color:var(--muted)">CTR: ${c.ctr}</div></div><span class="badge ${c.s==='Top'?'bg':c.s==='Teste'?'ba':'bb'}">${c.s}</span></div>`).join('');
+  new Chart(document.getElementById('cMetaArea'),{type:'line',data:{labels:lb8,datasets:[{label:'Alcance',data:mk(60000,15000),borderColor:'#1877F2',backgroundColor:'rgba(24,119,242,.1)',fill:true,tension:.4,yAxisID:'y'},{label:'Cliques',data:mk(3000,800),borderColor:'#34D399',fill:false,tension:.4,yAxisID:'y1'}]},options:{...cd,scales:{x:cd.scales.x,y:{...cd.scales.y,position:'left'},y1:{...cd.scales.y,position:'right',grid:{drawOnChartArea:false}}}}});
+  new Chart(document.getElementById('cMetaObj'),{type:'bar',data:{labels:['Conversão','Leads','Alcance','Tráfego'],datasets:[{label:'ROAS',data:[4.9,4.1,0,3.2],backgroundColor:['#1877F2','#1877F2bb','#1877F255','#1877F288'],borderRadius:5}]},options:{...cd,plugins:{legend:{display:false}}}});
+  new Chart(document.getElementById('cMetaAge'),{type:'bar',data:{labels:['18-24','25-34','35-44','45-54','55+'],datasets:[{label:'Mulher',data:[18,32,24,14,8],backgroundColor:'rgba(236,72,153,.7)',borderRadius:3},{label:'Homem',data:[12,28,20,10,6],backgroundColor:'rgba(24,119,242,.7)',borderRadius:3}]},options:cd});
+}
+function initGoogle(){
+  document.getElementById('tbGoog').innerHTML=[{n:'Search Brand TechPrime',t:'Search',s:'Ativo',sc:'8',inv:'R$ 4.800',cv:'145',roas:'4,1x'},{n:'PMax Shopping Bella',t:'PMax',s:'Ativo',sc:'—',inv:'R$ 6.100',cv:'189',roas:'3,7x'},{n:'Display Awareness',t:'Display',s:'Em revisão',sc:'6',inv:'R$ 3.200',cv:'72',roas:'3,1x'},{n:'Search Non-Brand',t:'Search',s:'Pausado',sc:'7',inv:'R$ 1.990',cv:'54',roas:'3,0x'}].map(c=>`<tr><td style="font-weight:600">${c.n}</td><td><span class="badge bb">${c.t}</span></td><td>${sb(c.s)}</td><td>${c.sc!=='—'?`<span class="badge ${parseInt(c.sc)>=8?'bg':parseInt(c.sc)>=6?'ba':'br'}">${c.sc}/10</span>`:'—'}</td><td>${c.inv}</td><td>${c.cv}</td><td style="font-weight:700;color:var(--green)">${c.roas}</td></tr>`).join('');
+  document.getElementById('tbKw').innerHTML=[{k:'clínica implante curitiba',m:'Exato',cl:'1.842',cpc:'R$ 0,48',cv:'87'},{k:'loja bella online',m:'Frase',cl:'2.140',cpc:'R$ 0,32',cv:'112'},{k:'software gestão techprime',m:'Ampla',cl:'980',cpc:'R$ 1,20',cv:'34'},{k:'tratamento implante',m:'Exato',cl:'1.240',cpc:'R$ 0,68',cv:'62'},{k:'techprime erp',m:'Exato',cl:'620',cpc:'R$ 1,80',cv:'28'}].map(k=>`<tr><td style="font-size:11px">${k.k}</td><td><span class="badge bp">${k.m}</span></td><td>${k.cl}</td><td>${k.cpc}</td><td style="color:var(--green);font-weight:600">${k.cv}</td></tr>`).join('');
+  new Chart(document.getElementById('cGoogLine'),{type:'line',data:{labels:lb8,datasets:[{label:'Impressões',data:mk(110000,30000),borderColor:'#4285F4',backgroundColor:'rgba(66,133,244,.08)',fill:true,tension:.4,yAxisID:'y'},{label:'Conversões',data:mk(60,20),borderColor:'#FBBC05',fill:false,tension:.4,yAxisID:'y1'}]},options:{...cd,scales:{x:cd.scales.x,y:{...cd.scales.y,position:'left'},y1:{...cd.scales.y,position:'right',grid:{drawOnChartArea:false}}}}});
+  new Chart(document.getElementById('cGoogDev'),{type:'bar',data:{labels:['Mobile','Desktop','Tablet'],datasets:[{label:'Cliques',data:[14200,9800,810],backgroundColor:['#4285F4','#34A853','#FBBC05'],borderRadius:6}]},options:{...cd,plugins:{legend:{display:false}}}});
+}
+function initTikTok(){
+  document.getElementById('ttCreat').innerHTML=[{e:'🔥',n:'Unboxing Bella Tendência',tc:'48%',ctr:'5,2%',v:'R$ 0,02/view',trend:true},{e:'💄',n:'Transformação Before/After',tc:'42%',ctr:'4,1%',v:'R$ 0,03/view',trend:true},{e:'📦',n:'Review Produto Hero',tc:'34%',ctr:'3,2%',v:'R$ 0,03/view',trend:false},{e:'🎵',n:'Trend Audio + Produto',tc:'29%',ctr:'2,8%',v:'R$ 0,04/view',trend:false}].map(c=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)"><div style="width:38px;height:38px;border-radius:6px;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px">${c.e}</div><div style="flex:1"><div style="font-size:12px;font-weight:600">${c.n} ${c.trend?'<span class="badge btt" style="font-size:9px">🔥 Trend</span>':''}</div><div style="font-size:10px;color:var(--muted)">Conclusão: ${c.tc} · CTR: ${c.ctr}</div></div><div style="font-size:11px;color:var(--muted)">${c.v}</div></div>`).join('');
+  new Chart(document.getElementById('cTTArea'),{type:'line',data:{labels:lb8,datasets:[{label:'Views',data:mk(300000,80000),borderColor:'#FF0050',backgroundColor:'rgba(255,0,80,.1)',fill:true,tension:.4,yAxisID:'y'},{label:'Eng.',data:mk(15000,4000),borderColor:'#00F2EA',fill:false,tension:.4,yAxisID:'y1'}]},options:{...cd,scales:{x:cd.scales.x,y:{...cd.scales.y,position:'left'},y1:{...cd.scales.y,position:'right',grid:{drawOnChartArea:false}}}}});
+  new Chart(document.getElementById('cTTRet'),{type:'bar',data:{labels:['3s Views','6s Views','Conclusão'],datasets:[{label:'Taxa %',data:[72,54,38],backgroundColor:['#FF0050','#FF5580','#00F2EA'],borderRadius:6}]},options:{...cd,plugins:{legend:{display:false}},scales:{...cd.scales,y:{...cd.scales.y,max:100}}}});
+}
+function initComp(){
+  const d={Meta:[{l:'Investimento',v:'R$ 22.714'},{l:'Leads',v:'642'},{l:'CTR',v:'2,84%'},{l:'CPA',v:'R$ 34,20'}],Google:[{l:'Investimento',v:'R$ 16.090'},{l:'Conversões',v:'487'},{l:'CTR',v:'2,78%'},{l:'CPA',v:'R$ 32,76'}],TikTok:[{l:'Investimento',v:'R$ 8.516'},{l:'Leads',v:'98'},{l:'CTR',v:'3,20%'},{l:'CPA',v:'R$ 41,60'}]};
+  ['Meta','Google','TikTok'].forEach(p=>document.getElementById('comp'+p).innerHTML=d[p].map(i=>`<div class="stat" style="text-align:left"><span style="font-size:11px;color:var(--muted)">${i.l}</span><span style="font-size:12px;font-weight:600">${i.v}</span></div>`).join(''));
+  new Chart(document.getElementById('cCompRoas'),{type:'bar',data:{labels:lb8,datasets:[{label:'Meta',data:mk(4.8,.6),backgroundColor:'#1877F2',borderRadius:3},{label:'Google',data:mk(3.9,.5),backgroundColor:'#4285F4',borderRadius:3},{label:'TikTok',data:mk(3.2,.5),backgroundColor:'#FF0050',borderRadius:3}]},options:cd});
+  new Chart(document.getElementById('cCompCpa'),{type:'line',data:{labels:lb8,datasets:[{label:'Meta',data:mk(34.2,4),borderColor:'#1877F2',tension:.4,pointRadius:3},{label:'Google',data:mk(32.7,4),borderColor:'#4285F4',tension:.4,pointRadius:3},{label:'TikTok',data:mk(41.6,5),borderColor:'#FF0050',tension:.4,pointRadius:3}]},options:cd});
+}
+function initFunil(){
+  const steps=[{n:'Impressões',v:3840000,color:'#6366F1'},{n:'Alcance',v:1240000,color:'#8B5CF6'},{n:'Cliques',v:47800,color:'#06B6D4'},{n:'Leads',v:1847,color:'#22C55E'},{n:'Vendas',v:487,color:'#F59E0B'}];
+  const mx=steps[0].v;
+  document.getElementById('funnelViz').innerHTML=steps.map((s,i)=>`<div class="funnel-bar"><div style="width:90px;font-size:11px;color:var(--muted);text-align:right;padding-right:8px">${s.n}</div><div class="funnel-track"><div class="funnel-fill" style="width:${Math.round(s.v/mx*100)}%;background:${s.color}"><span class="funnel-label">${s.v>=1000000?(s.v/1000000).toFixed(1)+'M':s.v>=1000?(s.v/1000).toFixed(0)+'k':s.v}</span></div></div>${i>0?`<div style="font-size:10px;color:var(--muted);width:46px;text-align:right">${(s.v/steps[i-1].v*100).toFixed(1)}%</div>`:'<div style="width:46px"></div>'}</div>`).join('');
+  new Chart(document.getElementById('cFunilPlat'),{type:'bar',data:{labels:['Cliques','Leads','Vendas'],datasets:[{label:'Meta',data:[28400,1227,380],backgroundColor:'#1877F2',borderRadius:3},{label:'Google',data:[14200,487,105],backgroundColor:'#4285F4',borderRadius:3},{label:'TikTok',data:[5200,133,2],backgroundColor:'#FF0050',borderRadius:3}]},options:cd});
+}
+function initAlertas(){
+  document.getElementById('alertasList').innerHTML=[{tipo:'alr',ico:'🚨',txt:'ROAS abaixo de 2,5x — Display Awareness',sub:'Hoje 09:14 · TechPrime',acao:'Ver'},{tipo:'alr',ico:'🚨',txt:'CPA acima de R$ 80 — TikTok Produto Hero',sub:'Hoje 08:52 · Loja Bella',acao:'Otimizar'},{tipo:'alr',ico:'🚨',txt:'CTR abaixo de 1% — Search Non-Brand',sub:'Ontem 22:30 · TechPrime',acao:'Ver'},{tipo:'ala',ico:'⚠️',txt:'Budget 80% consumido — Search Brand',sub:'Hoje 11:00',acao:'Ajustar'},{tipo:'alg',ico:'✅',txt:'ROAS recorde 5,1x — Remarketing Verão',sub:'Ontem 18:45 · Loja Bella',acao:'Escalar'},{tipo:'alg',ico:'📈',txt:'CTR +40% — Carrossel Produtos Verão',sub:'Ontem 16:20',acao:'Ver'}].map(a=>`<div class="alert-card ${a.tipo}"><span style="font-size:15px">${a.ico}</span><div style="flex:1"><div style="font-size:12px;font-weight:600">${a.txt}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${a.sub}</div></div><button class="btn" style="font-size:10px;padding:4px 8px" onclick="showT('${a.acao}...')">${a.acao}</button></div>`).join('');
+  document.getElementById('regrasList').innerHTML=[{m:'ROAS',c:'< 2,5',p:'Todas',ch:'E-mail+WA'},{m:'CPA',c:'> R$ 80',p:'Todas',ch:'E-mail'},{m:'CTR',c:'< 1%',p:'Google',ch:'E-mail'},{m:'Budget',c:'> 80%',p:'Todas',ch:'WhatsApp'}].map(r=>`<div class="stat"><div><div style="font-size:11px;font-weight:600">${r.m} ${r.c}</div><div style="font-size:10px;color:var(--muted)">${r.p} · ${r.ch}</div></div><div class="tog on" onclick="this.classList.toggle('on')"><div class="tog-knob"></div></div></div>`).join('');
+  new Chart(document.getElementById('cAlertas'),{type:'bar',data:{labels:['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],datasets:[{label:'Críticos',data:[2,1,3,1,2,0,1],backgroundColor:'rgba(239,68,68,.7)',borderRadius:3},{label:'Avisos',data:[3,2,4,3,3,1,2],backgroundColor:'rgba(245,158,11,.7)',borderRadius:3},{label:'Oport.',data:[1,2,1,2,3,1,2],backgroundColor:'rgba(34,197,94,.7)',borderRadius:3}]},options:cd});
+  renderCfgRegras();
+}
+function renderCfgRegras(){const el=document.getElementById('cfgRegrasList');if(!el)return;el.innerHTML=[{m:'ROAS',c:'Menor que 2,5',p:'Todas',ch:'E-mail+WhatsApp',on:true},{m:'CPA',c:'Maior que R$ 80',p:'Todas',ch:'E-mail',on:true},{m:'CTR',c:'Menor que 1%',p:'Google Ads',ch:'E-mail',on:false},{m:'Budget diário',c:'Maior que 80%',p:'Todas',ch:'WhatsApp',on:true}].map(r=>`<div class="acc" style="margin-bottom:6px"><div style="flex:1"><div style="font-weight:600;font-size:12px">${r.m} ${r.c}</div><div style="font-size:10px;color:var(--muted)">${r.p} · ${r.ch}</div></div><div class="tog ${r.on?'on':''}" onclick="this.classList.toggle('on')"><div class="tog-knob"></div></div><button class="btn btnd" style="font-size:10px;padding:3px 8px;margin-left:6px" onclick="showT('Removida!')">✕</button></div>`).join('');}
+function renderRelHist(){document.getElementById('relHistList').innerHTML=[{n:'Relatório Fevereiro — Loja Bella',s:'Enviado',d:'28/02/2026',dest:'joao@lobella.com.br'},{n:'Relatório Semanal — TechPrime',s:'Enviado',d:'20/03/2026',dest:'ana@techprime.com.br'},{n:'Performance Quinzenal — Loja Bella',s:'Enviado',d:'14/03/2026',dest:'joao@lobella.com.br'},{n:'Relatório Janeiro — Clínica Viva',s:'Enviado',d:'31/01/2026',dest:'mkt@clinicaviva.com.br'},{n:'Relatório Dezembro — TechPrime',s:'Erro',d:'31/12/2025',dest:'ana@techprime.com.br'}].map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)"><div style="flex:1"><div style="font-size:12px;font-weight:600">${r.n}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${r.d} · ${r.dest}</div></div><span class="badge ${r.s==='Enviado'?'bg':'br'}">${r.s}</span><button class="btn" style="font-size:10px;padding:4px 8px" onclick="showT('Reenviando...')">Reenviar</button></div>`).join('');}
+function renderRelAgend(){document.getElementById('relAgendList').innerHTML=[{n:'Relatório Mensal — Clínica Viva',freq:'Mensal',prox:'31/03/2026',dest:'mkt@clinicaviva.com.br'},{n:'Relatório Semanal — Loja Bella',freq:'Semanal',prox:'31/03/2026',dest:'joao@lobella.com.br'},{n:'Performance Quinzenal — TechPrime',freq:'Quinzenal',prox:'07/04/2026',dest:'ana@techprime.com.br'}].map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)"><div style="flex:1"><div style="font-size:12px;font-weight:600">${r.n}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">Próximo: ${r.prox} · ${r.dest}</div></div><span class="badge ba">${r.freq}</span><button class="btn" style="font-size:10px;padding:4px 8px" onclick="showT('Editado!')">Editar</button><button class="btn btnd" style="font-size:10px;padding:4px 8px" onclick="showT('Cancelado!')">✕</button></div>`).join('');}
+function enviar(){const b=document.getElementById('btnEnviar');b.textContent='Gerando...';b.disabled=true;b.style.opacity='.6';setTimeout(()=>{b.textContent='Gerar e Enviar →';b.disabled=false;b.style.opacity='1';showT('Relatório enviado com sucesso!')},1800);}
+setTimeout(initDash,100);
+</script>
+</body>
+</html>
